@@ -1,0 +1,243 @@
+#include "../xml/xml.hpp"
+
+#include <string>
+#include <cstdlib>
+
+////////////////
+// Text class //
+////////////////
+
+class Text {
+public:
+    Text() = default;
+    Text(std::string set_text);
+    std::string text;
+    bool bold = false;
+    bool italic = false;
+    bool preserve_space = false;
+};
+
+Text::Text(std::string set_text) {
+    text = set_text;
+}
+
+/////////////////////
+// Paragraph class //
+/////////////////////
+
+class Paragraph {
+public:
+    Paragraph() = default;
+
+    void add_text(std::string text_str);
+    void add_space(size_t count = 1);
+    void add_bold_text(std::string text_str);
+    void add_italic_text(std::string text_str);
+    XML::Node get();
+    bool empty = false; // if true all content is ignored and a new empty line is shown
+
+    static XML::Node empty_line_node();
+
+private:
+    std::vector<Text> contents;
+};
+
+XML::Node Paragraph::empty_line_node() {
+    XML::Node p("w:p");
+    {
+        XML::Node pPr("w:pPr");
+        {
+            XML::Node pStyle("w:pStyle");
+            pStyle.self_closing = true;
+            pStyle.attributes["w:val"] = "Normal";
+            XML::Node bidi("w:bidi");
+            bidi.self_closing = true;
+            bidi.attributes["w:val"] = "0";
+            XML::Node jc("w:jc");
+            jc.self_closing = true;
+            jc.attributes["w:val"] = "start";
+            XML::Node rPr("w:rPr");
+
+            pPr.add_child(pStyle);
+            pPr.add_child(bidi);
+            pPr.add_child(jc);
+            pPr.add_child(rPr);
+        }
+        p.add_child(pPr);
+
+        XML::Node r("w:r");
+        {
+            XML::Node rPr("w:rPr");
+            r.add_child(rPr);
+        }
+        p.add_child(r);
+    }
+    return p;
+}
+
+void Paragraph::add_text(std::string text_str) {
+    Text t(text_str);
+    contents.push_back(t);
+}
+
+void Paragraph::add_space(size_t count) {
+    Text t(" ");
+    t.preserve_space = true;
+    contents.push_back(t);
+}
+
+void Paragraph::add_bold_text(std::string text_str) {
+    Text t(text_str);
+    t.bold = true;
+    contents.push_back(t);
+}
+
+void Paragraph::add_italic_text(std::string text_str) {
+    Text t(text_str);
+    t.italic = true;
+    contents.push_back(t);
+}
+
+XML::Node Paragraph::get() {
+    XML::Node p("w:p");
+    {
+        XML::Node pPr("w:pPr");
+        {
+            XML::Node pStyle("w:pStyle");
+            pStyle.self_closing = true;
+            pStyle.attributes["w:val"] = "Normal";
+            XML::Node bidi("w:bidi");
+            bidi.self_closing = true;
+            bidi.attributes["w:val"] = "0";
+            XML::Node jc("w:jc");
+            jc.self_closing = true;
+            jc.attributes["w:val"] = "start";
+            XML::Node rPr("w:rPr");
+
+            pPr.add_child(pStyle);
+            pPr.add_child(bidi);
+            pPr.add_child(jc);
+            pPr.add_child(rPr);
+        }
+        p.add_child(pPr);
+
+        for (size_t i = 0; i < contents.size(); i++) {
+            Text cur_text = contents.at(i);
+
+            XML::Node r("w:r");
+            {
+                XML::Node rPr("w:rPr");
+                {
+                    if (cur_text.bold) {
+                        XML::Node b("w:b");
+                        b.self_closing = true;
+                        XML::Node bCs("w:bCs");
+                        bCs.self_closing = true;
+
+                        rPr.add_child(b);
+                        rPr.add_child(bCs);
+                    }
+
+                    if (cur_text.italic) {
+                        XML::Node i("w:i");
+                        i.self_closing = true;
+                        XML::Node iCs("w:iCs");
+                        iCs.self_closing = true;
+
+                        rPr.add_child(i);
+                        rPr.add_child(iCs);
+                    }
+                }
+                r.add_child(rPr);
+
+                XML::Node t("w:t");
+                t.content = cur_text.text;
+                if (cur_text.preserve_space) {
+                    t.attributes["xml:space"] = "preserve";
+                }
+                r.add_child(t);
+            }
+            p.add_child(r);
+        }
+    }
+    return p;
+}
+
+////////////////
+// DOCX class //
+////////////////
+
+class DOCX {
+public:
+    DOCX() = default;
+
+    void add_paragraph(Paragraph paragraph);
+    void add_empty_line();
+    void print();
+    void save(std::string fname);
+    
+private:
+    std::vector<Paragraph> paragraphs;
+    XML::Node get();
+
+    static XML::Node root_node();
+};
+
+XML::Node DOCX::root_node() {
+    XML::Node root("w:document");
+    root.attributes["xmlns:o"] = "urn:schemas-microsoft-com:office:office";
+    root.attributes["xmlns:r"] = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+	root.attributes["xmlns:v"] = "urn:schemas-microsoft-com:vml";
+	root.attributes["xmlns:w"] = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+	root.attributes["xmlns:w10"] = "urn:schemas-microsoft-com:office:word";
+	root.attributes["xmlns:wp"] = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing";
+	root.attributes["xmlns:pic"] = "http://schemas.openxmlformats.org/drawingml/2006/picture";
+	root.attributes["xmlns:wps"] = "http://schemas.microsoft.com/office/word/2010/wordprocessingShape";
+	root.attributes["xmlns:wpg"] = "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup";
+	root.attributes["xmlns:mc"] = "http://schemas.openxmlformats.org/markup-compatibility/2006";
+	root.attributes["xmlns:wp14"] = "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing";
+	root.attributes["xmlns:w14"] = "http://schemas.microsoft.com/office/word/2010/wordml";
+	root.attributes["xmlns:w15"] = "http://schemas.microsoft.com/office/word/2012/wordml";
+    root.attributes["mc:Ignorable"] = "w14 wp14 w15";
+    return root;
+}
+
+void DOCX::add_paragraph(Paragraph paragraph) {
+    paragraphs.push_back(paragraph);
+}
+
+void DOCX::add_empty_line() {
+    Paragraph p;
+    p.empty = true;
+    paragraphs.push_back(p);
+}
+
+XML::Node DOCX::get() {
+    XML::Node root = root_node();
+    XML::Node body("w:body");
+
+    for (size_t i = 0; i < paragraphs.size(); i++) {
+        Paragraph cur_p = paragraphs.at(i);
+        if (cur_p.empty) {
+            body.add_child(Paragraph::empty_line_node());
+        } else {
+            body.add_child(paragraphs.at(i).get());
+        }
+    }
+
+    root.add_child(body);
+    root.traverse();
+    return root;
+}
+
+void DOCX::print() {
+    get().generate_and_print();
+}
+
+void DOCX::save(std::string fname) {
+    XML::Node root = get();
+    root.save("docx_root/word/document.xml");
+    std::string save_cmd = "( cd docx_root && zip -r ../" + fname + " . > /dev/null 2>&1 )";
+    system(save_cmd.c_str());
+    std::cout << "Saved as " << fname << newl;
+}

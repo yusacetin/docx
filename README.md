@@ -1,0 +1,1 @@
+Simple library for creating (very) simple docx files, made with [my XML library](https://github.com/yusacetin/xml). Same philosophy. Requires the zip program to be installed and only runs on POSIX systems (due to system call, might make cross platform later).
