@@ -3,29 +3,36 @@
 #include <string>
 #include <cstdlib>
 
-////////////////
-// Text class //
-////////////////
+//////////////////////
+// DOCX declaration //
+//////////////////////
 
-class Text {
+class DOCX {
 public:
-    Text() = default;
-    Text(std::string set_text);
-    std::string text;
-    bool bold = false;
-    bool italic = false;
-    bool preserve_space = false;
+    #define newl "\n"
+
+    DOCX() = default;
+
+    class Paragraph;
+    class Text;
+
+    void add_paragraph(DOCX::Paragraph paragraph);
+    void add_empty_line();
+    void print();
+    void save(std::string fname);
+    
+private:
+    std::vector<DOCX::Paragraph> paragraphs;
+    XML::Node get();
+
+    static XML::Node root_node();
 };
 
-Text::Text(std::string set_text) {
-    text = set_text;
-}
+///////////////////////////
+// Paragraph declaration //
+///////////////////////////
 
-/////////////////////
-// Paragraph class //
-/////////////////////
-
-class Paragraph {
+class DOCX::Paragraph {
 public:
     Paragraph() = default;
 
@@ -39,10 +46,90 @@ public:
     static XML::Node empty_line_node();
 
 private:
-    std::vector<Text> contents;
+    std::vector<DOCX::Text> contents;
 };
 
-XML::Node Paragraph::empty_line_node() {
+//////////////////////
+// Text declaration //
+//////////////////////
+
+class DOCX::Text {
+public:
+    Text() = default;
+    Text(std::string set_text);
+    std::string text;
+    bool bold = false;
+    bool italic = false;
+    bool preserve_space = false;
+};
+
+//////////////////////
+// DOCX definitions //
+//////////////////////
+
+XML::Node DOCX::root_node() {
+    XML::Node root("w:document");
+    root.attributes["xmlns:o"] = "urn:schemas-microsoft-com:office:office";
+    root.attributes["xmlns:r"] = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+	root.attributes["xmlns:v"] = "urn:schemas-microsoft-com:vml";
+	root.attributes["xmlns:w"] = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+	root.attributes["xmlns:w10"] = "urn:schemas-microsoft-com:office:word";
+	root.attributes["xmlns:wp"] = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing";
+	root.attributes["xmlns:pic"] = "http://schemas.openxmlformats.org/drawingml/2006/picture";
+	root.attributes["xmlns:wps"] = "http://schemas.microsoft.com/office/word/2010/wordprocessingShape";
+	root.attributes["xmlns:wpg"] = "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup";
+	root.attributes["xmlns:mc"] = "http://schemas.openxmlformats.org/markup-compatibility/2006";
+	root.attributes["xmlns:wp14"] = "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing";
+	root.attributes["xmlns:w14"] = "http://schemas.microsoft.com/office/word/2010/wordml";
+	root.attributes["xmlns:w15"] = "http://schemas.microsoft.com/office/word/2012/wordml";
+    root.attributes["mc:Ignorable"] = "w14 wp14 w15";
+    return root;
+}
+
+void DOCX::add_paragraph(DOCX::Paragraph paragraph) {
+    paragraphs.push_back(paragraph);
+}
+
+void DOCX::add_empty_line() {
+    DOCX::Paragraph p;
+    p.empty = true;
+    paragraphs.push_back(p);
+}
+
+XML::Node DOCX::get() {
+    XML::Node root = root_node();
+    XML::Node body("w:body");
+
+    for (size_t i = 0; i < paragraphs.size(); i++) {
+        DOCX::Paragraph cur_p = paragraphs.at(i);
+        if (cur_p.empty) {
+            body.add_child(DOCX::Paragraph::empty_line_node());
+        } else {
+            body.add_child(paragraphs.at(i).get());
+        }
+    }
+
+    root.add_child(body);
+    return root;
+}
+
+void DOCX::print() {
+    get().print();
+}
+
+void DOCX::save(std::string fname) {
+    XML::Node root = get();
+    root.save("docx_root/word/document.xml");
+    std::string save_cmd = "( cd docx_root && zip -r ../" + fname + " . > /dev/null 2>&1 )";
+    system(save_cmd.c_str());
+    std::cout << "Saved as " << fname << newl;
+}
+
+///////////////////////////
+// Paragraph definitions //
+///////////////////////////
+
+XML::Node DOCX::Paragraph::empty_line_node() {
     XML::Node p("w:p");
     {
         XML::Node pPr("w:pPr");
@@ -75,30 +162,30 @@ XML::Node Paragraph::empty_line_node() {
     return p;
 }
 
-void Paragraph::add_text(std::string text_str) {
+void DOCX::Paragraph::add_text(std::string text_str) {
     Text t(text_str);
     contents.push_back(t);
 }
 
-void Paragraph::add_space(size_t count) {
+void DOCX::Paragraph::add_space(size_t count) {
     Text t(" ");
     t.preserve_space = true;
     contents.push_back(t);
 }
 
-void Paragraph::add_bold_text(std::string text_str) {
+void DOCX::Paragraph::add_bold_text(std::string text_str) {
     Text t(text_str);
     t.bold = true;
     contents.push_back(t);
 }
 
-void Paragraph::add_italic_text(std::string text_str) {
+void DOCX::Paragraph::add_italic_text(std::string text_str) {
     Text t(text_str);
     t.italic = true;
     contents.push_back(t);
 }
 
-XML::Node Paragraph::get() {
+XML::Node DOCX::Paragraph::get() {
     XML::Node p("w:p");
     {
         XML::Node pPr("w:pPr");
@@ -163,81 +250,10 @@ XML::Node Paragraph::get() {
     return p;
 }
 
-////////////////
-// DOCX class //
-////////////////
+//////////////////////
+// Text definitions //
+//////////////////////
 
-class DOCX {
-public:
-    DOCX() = default;
-
-    void add_paragraph(Paragraph paragraph);
-    void add_empty_line();
-    void print();
-    void save(std::string fname);
-    
-private:
-    std::vector<Paragraph> paragraphs;
-    XML::Node get();
-
-    static XML::Node root_node();
-};
-
-XML::Node DOCX::root_node() {
-    XML::Node root("w:document");
-    root.attributes["xmlns:o"] = "urn:schemas-microsoft-com:office:office";
-    root.attributes["xmlns:r"] = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
-	root.attributes["xmlns:v"] = "urn:schemas-microsoft-com:vml";
-	root.attributes["xmlns:w"] = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
-	root.attributes["xmlns:w10"] = "urn:schemas-microsoft-com:office:word";
-	root.attributes["xmlns:wp"] = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing";
-	root.attributes["xmlns:pic"] = "http://schemas.openxmlformats.org/drawingml/2006/picture";
-	root.attributes["xmlns:wps"] = "http://schemas.microsoft.com/office/word/2010/wordprocessingShape";
-	root.attributes["xmlns:wpg"] = "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup";
-	root.attributes["xmlns:mc"] = "http://schemas.openxmlformats.org/markup-compatibility/2006";
-	root.attributes["xmlns:wp14"] = "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing";
-	root.attributes["xmlns:w14"] = "http://schemas.microsoft.com/office/word/2010/wordml";
-	root.attributes["xmlns:w15"] = "http://schemas.microsoft.com/office/word/2012/wordml";
-    root.attributes["mc:Ignorable"] = "w14 wp14 w15";
-    return root;
-}
-
-void DOCX::add_paragraph(Paragraph paragraph) {
-    paragraphs.push_back(paragraph);
-}
-
-void DOCX::add_empty_line() {
-    Paragraph p;
-    p.empty = true;
-    paragraphs.push_back(p);
-}
-
-XML::Node DOCX::get() {
-    XML::Node root = root_node();
-    XML::Node body("w:body");
-
-    for (size_t i = 0; i < paragraphs.size(); i++) {
-        Paragraph cur_p = paragraphs.at(i);
-        if (cur_p.empty) {
-            body.add_child(Paragraph::empty_line_node());
-        } else {
-            body.add_child(paragraphs.at(i).get());
-        }
-    }
-
-    root.add_child(body);
-    root.traverse();
-    return root;
-}
-
-void DOCX::print() {
-    get().generate_and_print();
-}
-
-void DOCX::save(std::string fname) {
-    XML::Node root = get();
-    root.save("docx_root/word/document.xml");
-    std::string save_cmd = "( cd docx_root && zip -r ../" + fname + " . > /dev/null 2>&1 )";
-    system(save_cmd.c_str());
-    std::cout << "Saved as " << fname << newl;
+DOCX::Text::Text(std::string set_text) {
+    text = set_text;
 }

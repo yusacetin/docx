@@ -3,13 +3,13 @@
 int main() {
     DOCX docx;
 
-    Paragraph p;
+    DOCX::Paragraph p;
     p.add_text("hello world");
     p.add_space();
     p.add_italic_text("this is italic");
     docx.add_paragraph(p);
 
-    Paragraph p2;
+    DOCX::Paragraph p2;
     p2.add_bold_text("this is bold");
     p2.add_space();
     p2.add_text("this is not bold");
