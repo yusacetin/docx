@@ -81,5 +81,240 @@
                 <w:t>this is italic</w:t>
             </w:r>
         </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr>
+                    <w:b/>
+                    <w:bCs/>
+                    <w:i/>
+                    <w:iCs/>
+                </w:rPr>
+                <w:t>This is both bold and italic!</w:t>
+            </w:r>
+        </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr></w:rPr>
+            </w:r>
+        </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t>This text is just plain</w:t>
+            </w:r>
+        </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr></w:rPr>
+            </w:r>
+        </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr>
+                    <w:u w:val="single"></w:u>
+                </w:rPr>
+                <w:t>hello underline</w:t>
+            </w:r>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t xml:space="preserve"> </w:t>
+            </w:r>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t>and</w:t>
+            </w:r>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t xml:space="preserve"> </w:t>
+            </w:r>
+            <w:r>
+                <w:rPr>
+                    <w:strike/>
+                </w:rPr>
+                <w:t>strikethrough</w:t>
+            </w:r>
+        </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr></w:rPr>
+            </w:r>
+        </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t>Wow,</w:t>
+            </w:r>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t xml:space="preserve"> </w:t>
+            </w:r>
+            <w:r>
+                <w:rPr>
+                    <w:b/>
+                    <w:bCs/>
+                    <w:i/>
+                    <w:iCs/>
+                    <w:u w:val="single"></w:u>
+                    <w:strike/>
+                </w:rPr>
+                <w:t>these words</w:t>
+            </w:r>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t xml:space="preserve"> </w:t>
+            </w:r>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t>have all the formatting!</w:t>
+            </w:r>
+        </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr></w:rPr>
+            </w:r>
+        </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t>Look at all</w:t>
+            </w:r>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t xml:space="preserve">      </w:t>
+            </w:r>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t>these</w:t>
+            </w:r>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t xml:space="preserve">    </w:t>
+            </w:r>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t>spaces</w:t>
+            </w:r>
+        </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr></w:rPr>
+            </w:r>
+        </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr></w:rPr>
+            </w:r>
+        </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr></w:rPr>
+            </w:r>
+        </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr></w:rPr>
+            </w:r>
+        </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr></w:rPr>
+            </w:r>
+        </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t>There are 5 empty lines above this line!</w:t>
+            </w:r>
+        </w:p>
     </w:body>
 </w:document>

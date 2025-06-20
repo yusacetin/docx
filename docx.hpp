@@ -17,7 +17,7 @@ public:
     class Text;
 
     void add_paragraph(DOCX::Paragraph paragraph);
-    void add_empty_line();
+    void add_empty_line(size_t count = 1);
     void print();
     void save(std::string fname);
     
@@ -36,13 +36,17 @@ class DOCX::Paragraph {
 public:
     Paragraph() = default;
 
-    void add_text(std::string text_str);
+    bool empty = false; // if true all content is ignored and a new empty line is shown
+
+    void add_formatted_text(Text t);
+    void add_plain_text(std::string text_str);
     void add_space(size_t count = 1);
     void add_bold_text(std::string text_str);
     void add_italic_text(std::string text_str);
+    void add_underlined_text(std::string text_str);
+    void add_struckthrough_text(std::string text_str);
     XML::Node get();
-    bool empty = false; // if true all content is ignored and a new empty line is shown
-
+    
     static XML::Node empty_line_node();
 
 private:
@@ -60,12 +64,55 @@ public:
     std::string text;
     bool bold = false;
     bool italic = false;
+    bool underline = false;
+    bool strikethrough = false;
     bool preserve_space = false;
 };
 
 //////////////////////
 // DOCX definitions //
 //////////////////////
+
+void DOCX::add_paragraph(DOCX::Paragraph paragraph) {
+    paragraphs.push_back(paragraph);
+}
+
+void DOCX::add_empty_line(size_t count) {
+    for (size_t i = 0; i < count; i++) {
+        DOCX::Paragraph p;
+        p.empty = true;
+        paragraphs.push_back(p);
+    }
+}
+
+void DOCX::print() {
+    get().print();
+}
+
+void DOCX::save(std::string fname) {
+    XML::Node root = get();
+    root.save("docx_root/word/document.xml");
+    std::string save_cmd = "( cd docx_root && zip -r ../" + fname + " . > /dev/null 2>&1 )";
+    system(save_cmd.c_str());
+    std::cout << "Saved as " << fname << newl;
+}
+
+XML::Node DOCX::get() {
+    XML::Node root = root_node();
+    XML::Node body("w:body");
+
+    for (size_t i = 0; i < paragraphs.size(); i++) {
+        DOCX::Paragraph cur_p = paragraphs.at(i);
+        if (cur_p.empty) {
+            body.add_child(DOCX::Paragraph::empty_line_node());
+        } else {
+            body.add_child(paragraphs.at(i).get());
+        }
+    }
+
+    root.add_child(body);
+    return root;
+}
 
 XML::Node DOCX::root_node() {
     XML::Node root("w:document");
@@ -86,89 +133,25 @@ XML::Node DOCX::root_node() {
     return root;
 }
 
-void DOCX::add_paragraph(DOCX::Paragraph paragraph) {
-    paragraphs.push_back(paragraph);
-}
-
-void DOCX::add_empty_line() {
-    DOCX::Paragraph p;
-    p.empty = true;
-    paragraphs.push_back(p);
-}
-
-XML::Node DOCX::get() {
-    XML::Node root = root_node();
-    XML::Node body("w:body");
-
-    for (size_t i = 0; i < paragraphs.size(); i++) {
-        DOCX::Paragraph cur_p = paragraphs.at(i);
-        if (cur_p.empty) {
-            body.add_child(DOCX::Paragraph::empty_line_node());
-        } else {
-            body.add_child(paragraphs.at(i).get());
-        }
-    }
-
-    root.add_child(body);
-    return root;
-}
-
-void DOCX::print() {
-    get().print();
-}
-
-void DOCX::save(std::string fname) {
-    XML::Node root = get();
-    root.save("docx_root/word/document.xml");
-    std::string save_cmd = "( cd docx_root && zip -r ../" + fname + " . > /dev/null 2>&1 )";
-    system(save_cmd.c_str());
-    std::cout << "Saved as " << fname << newl;
-}
-
 ///////////////////////////
 // Paragraph definitions //
 ///////////////////////////
 
-XML::Node DOCX::Paragraph::empty_line_node() {
-    XML::Node p("w:p");
-    {
-        XML::Node pPr("w:pPr");
-        {
-            XML::Node pStyle("w:pStyle");
-            pStyle.self_closing = true;
-            pStyle.attributes["w:val"] = "Normal";
-            XML::Node bidi("w:bidi");
-            bidi.self_closing = true;
-            bidi.attributes["w:val"] = "0";
-            XML::Node jc("w:jc");
-            jc.self_closing = true;
-            jc.attributes["w:val"] = "start";
-            XML::Node rPr("w:rPr");
-
-            pPr.add_child(pStyle);
-            pPr.add_child(bidi);
-            pPr.add_child(jc);
-            pPr.add_child(rPr);
-        }
-        p.add_child(pPr);
-
-        XML::Node r("w:r");
-        {
-            XML::Node rPr("w:rPr");
-            r.add_child(rPr);
-        }
-        p.add_child(r);
-    }
-    return p;
+void DOCX::Paragraph::add_formatted_text(Text t) {
+    contents.push_back(t);
 }
 
-void DOCX::Paragraph::add_text(std::string text_str) {
+void DOCX::Paragraph::add_plain_text(std::string text_str) {
     Text t(text_str);
     contents.push_back(t);
 }
 
 void DOCX::Paragraph::add_space(size_t count) {
-    Text t(" ");
+    std::string spaces;
+    for (size_t i = 0; i < count; i++) {
+        spaces += " ";
+    }
+    Text t(spaces);
     t.preserve_space = true;
     contents.push_back(t);
 }
@@ -182,6 +165,18 @@ void DOCX::Paragraph::add_bold_text(std::string text_str) {
 void DOCX::Paragraph::add_italic_text(std::string text_str) {
     Text t(text_str);
     t.italic = true;
+    contents.push_back(t);
+}
+
+void DOCX::Paragraph::add_underlined_text(std::string text_str) {
+    Text t(text_str);
+    t.underline = true;
+    contents.push_back(t);
+}
+
+void DOCX::Paragraph::add_struckthrough_text(std::string text_str) {
+    Text t(text_str);
+    t.strikethrough = true;
     contents.push_back(t);
 }
 
@@ -234,6 +229,18 @@ XML::Node DOCX::Paragraph::get() {
                         rPr.add_child(i);
                         rPr.add_child(iCs);
                     }
+
+                    if (cur_text.underline) {
+                        XML::Node u("w:u");
+                        u.attributes["w:val"] = "single";
+                        rPr.add_child(u);
+                    }
+
+                    if (cur_text.strikethrough) {
+                        XML::Node strike("w:strike");
+                        strike.self_closing = true;
+                        rPr.add_child(strike);
+                    }
                 }
                 r.add_child(rPr);
 
@@ -246,6 +253,39 @@ XML::Node DOCX::Paragraph::get() {
             }
             p.add_child(r);
         }
+    }
+    return p;
+}
+
+XML::Node DOCX::Paragraph::empty_line_node() {
+    XML::Node p("w:p");
+    {
+        XML::Node pPr("w:pPr");
+        {
+            XML::Node pStyle("w:pStyle");
+            pStyle.self_closing = true;
+            pStyle.attributes["w:val"] = "Normal";
+            XML::Node bidi("w:bidi");
+            bidi.self_closing = true;
+            bidi.attributes["w:val"] = "0";
+            XML::Node jc("w:jc");
+            jc.self_closing = true;
+            jc.attributes["w:val"] = "start";
+            XML::Node rPr("w:rPr");
+
+            pPr.add_child(pStyle);
+            pPr.add_child(bidi);
+            pPr.add_child(jc);
+            pPr.add_child(rPr);
+        }
+        p.add_child(pPr);
+
+        XML::Node r("w:r");
+        {
+            XML::Node rPr("w:rPr");
+            r.add_child(rPr);
+        }
+        p.add_child(r);
     }
     return p;
 }
