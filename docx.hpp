@@ -23,11 +23,14 @@ public:
     void add_empty_line(size_t count = 1);
     void print();
     void save(std::string fname);
-    
+    void set_global_font_size(size_t set_size); // TODO not used yet
+    size_t get_global_font_size();
+
 private:
     std::vector<DOCX::Paragraph> paragraphs;
     XML::Node get();
 
+    static size_t global_font_size;
     static XML::Node root_node();
 };
 
@@ -70,6 +73,7 @@ public:
     bool underline = false;
     bool strikethrough = false;
     bool preserve_space = false;
+    size_t size = 12;
 };
 
 //////////////////////
@@ -100,6 +104,15 @@ inline void DOCX::save(std::string fname) {
     std::cout << "Saved as " << fname << newl;
 }
 
+// TODO not used yet
+inline void DOCX::set_global_font_size(size_t set_size) {
+    global_font_size = set_size;
+}
+
+inline size_t DOCX::get_global_font_size() {
+    return global_font_size;
+}
+
 inline XML::Node DOCX::get() {
     XML::Node root = root_node();
     XML::Node body("w:body");
@@ -116,6 +129,8 @@ inline XML::Node DOCX::get() {
     root.add_child(body);
     return root;
 }
+
+inline size_t DOCX::global_font_size = 12;
 
 inline XML::Node DOCX::root_node() {
     XML::Node root("w:document");
@@ -213,6 +228,13 @@ inline XML::Node DOCX::Paragraph::get() {
             {
                 XML::Node rPr("w:rPr");
                 {
+                    if (cur_text.size != DOCX::global_font_size) {
+                        XML::Node sz("w:sz");
+                        sz.self_closing = true;
+                        sz.attributes["w:val"] = std::to_string(cur_text.size * 2); // because half points
+                        rPr.add_child(sz);
+                    }
+
                     if (cur_text.bold) {
                         XML::Node b("w:b");
                         b.self_closing = true;

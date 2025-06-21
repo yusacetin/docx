@@ -316,5 +316,29 @@
                 <w:t>There are 5 empty lines above this line!</w:t>
             </w:r>
         </w:p>
+        <w:p>
+            <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:bidi w:val="0"/>
+                <w:jc w:val="start"/>
+                <w:rPr></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr>
+                    <w:sz w:val="18"/>
+                </w:rPr>
+                <w:t>this text is smol</w:t>
+            </w:r>
+            <w:r>
+                <w:rPr></w:rPr>
+                <w:t xml:space="preserve"> </w:t>
+            </w:r>
+            <w:r>
+                <w:rPr>
+                    <w:sz w:val="40"/>
+                </w:rPr>
+                <w:t>this text is HUGE!</w:t>
+            </w:r>
+        </w:p>
     </w:body>
 </w:document>

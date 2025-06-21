@@ -75,6 +75,16 @@ int main() {
     DOCX::Paragraph p8;
     p8.add_plain_text("There are 5 empty lines above this line!");
     docx.add_paragraph(p8);
+
+    DOCX::Paragraph p9;
+    DOCX::Text t9("this text is smol");
+    t9.size = 9;
+    p9.add_formatted_text(t9);
+    p9.add_space();
+    DOCX::Text t92("this text is HUGE!");
+    t92.size = 20;
+    p9.add_formatted_text(t92);
+    docx.add_paragraph(p9);
     
     docx.save("my_document.docx");
     return 0;
