@@ -1,7 +1,12 @@
+#ifndef DOCX_HPP
+#define DOCX_HPP
+
 #include "../xml/xml.hpp"
 
 #include <string>
 #include <cstdlib>
+
+inline constexpr const char* newl = "\n";
 
 //////////////////////
 // DOCX declaration //
@@ -9,8 +14,6 @@
 
 class DOCX {
 public:
-    #define newl "\n"
-
     DOCX() = default;
 
     class Paragraph;
@@ -73,11 +76,11 @@ public:
 // DOCX definitions //
 //////////////////////
 
-void DOCX::add_paragraph(DOCX::Paragraph paragraph) {
+inline void DOCX::add_paragraph(DOCX::Paragraph paragraph) {
     paragraphs.push_back(paragraph);
 }
 
-void DOCX::add_empty_line(size_t count) {
+inline void DOCX::add_empty_line(size_t count) {
     for (size_t i = 0; i < count; i++) {
         DOCX::Paragraph p;
         p.empty = true;
@@ -85,11 +88,11 @@ void DOCX::add_empty_line(size_t count) {
     }
 }
 
-void DOCX::print() {
+inline void DOCX::print() {
     get().print();
 }
 
-void DOCX::save(std::string fname) {
+inline void DOCX::save(std::string fname) {
     XML::Node root = get();
     root.save("docx_root/word/document.xml");
     std::string save_cmd = "( cd docx_root && zip -r ../" + fname + " . > /dev/null 2>&1 )";
@@ -97,7 +100,7 @@ void DOCX::save(std::string fname) {
     std::cout << "Saved as " << fname << newl;
 }
 
-XML::Node DOCX::get() {
+inline XML::Node DOCX::get() {
     XML::Node root = root_node();
     XML::Node body("w:body");
 
@@ -114,7 +117,7 @@ XML::Node DOCX::get() {
     return root;
 }
 
-XML::Node DOCX::root_node() {
+inline XML::Node DOCX::root_node() {
     XML::Node root("w:document");
     root.attributes["xmlns:o"] = "urn:schemas-microsoft-com:office:office";
     root.attributes["xmlns:r"] = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
@@ -137,16 +140,16 @@ XML::Node DOCX::root_node() {
 // Paragraph definitions //
 ///////////////////////////
 
-void DOCX::Paragraph::add_formatted_text(Text t) {
+inline void DOCX::Paragraph::add_formatted_text(Text t) {
     contents.push_back(t);
 }
 
-void DOCX::Paragraph::add_plain_text(std::string text_str) {
+inline void DOCX::Paragraph::add_plain_text(std::string text_str) {
     Text t(text_str);
     contents.push_back(t);
 }
 
-void DOCX::Paragraph::add_space(size_t count) {
+inline void DOCX::Paragraph::add_space(size_t count) {
     std::string spaces;
     for (size_t i = 0; i < count; i++) {
         spaces += " ";
@@ -156,31 +159,31 @@ void DOCX::Paragraph::add_space(size_t count) {
     contents.push_back(t);
 }
 
-void DOCX::Paragraph::add_bold_text(std::string text_str) {
+inline void DOCX::Paragraph::add_bold_text(std::string text_str) {
     Text t(text_str);
     t.bold = true;
     contents.push_back(t);
 }
 
-void DOCX::Paragraph::add_italic_text(std::string text_str) {
+inline void DOCX::Paragraph::add_italic_text(std::string text_str) {
     Text t(text_str);
     t.italic = true;
     contents.push_back(t);
 }
 
-void DOCX::Paragraph::add_underlined_text(std::string text_str) {
+inline void DOCX::Paragraph::add_underlined_text(std::string text_str) {
     Text t(text_str);
     t.underline = true;
     contents.push_back(t);
 }
 
-void DOCX::Paragraph::add_struckthrough_text(std::string text_str) {
+inline void DOCX::Paragraph::add_struckthrough_text(std::string text_str) {
     Text t(text_str);
     t.strikethrough = true;
     contents.push_back(t);
 }
 
-XML::Node DOCX::Paragraph::get() {
+inline XML::Node DOCX::Paragraph::get() {
     XML::Node p("w:p");
     {
         XML::Node pPr("w:pPr");
@@ -257,7 +260,7 @@ XML::Node DOCX::Paragraph::get() {
     return p;
 }
 
-XML::Node DOCX::Paragraph::empty_line_node() {
+inline XML::Node DOCX::Paragraph::empty_line_node() {
     XML::Node p("w:p");
     {
         XML::Node pPr("w:pPr");
@@ -294,6 +297,8 @@ XML::Node DOCX::Paragraph::empty_line_node() {
 // Text definitions //
 //////////////////////
 
-DOCX::Text::Text(std::string set_text) {
+inline DOCX::Text::Text(std::string set_text) {
     text = set_text;
 }
+
+#endif
