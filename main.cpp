@@ -100,6 +100,41 @@ int main() {
     t92.size = 20;
     p9.add_formatted_text(t92);
     docx.add_paragraph(p9);
+
+    docx.add_empty_line(1, 20);
+
+    DOCX::Paragraph p10;
+    DOCX::Text t10("There's only one space above this line but it has a huge font size");
+    p10.add_text(t10);
+    docx.add_paragraph(p10);
+
+    docx.add_empty_line(2, 10);
+
+    DOCX::Paragraph p11;
+    DOCX::Text t11("There are two empty lines above this line but they are half the size of the previous empty line so the space should appear the same");
+    p11.add_text(t11);
+    docx.add_paragraph(p11);
+
+    docx.add_empty_line();
+
+    DOCX::Paragraph p12;
+    DOCX::Text t12("Look at this");
+    p12.add_text(t12);
+    p12.add_space();
+    p12.add_text("space, and");
+    p12.add_space();
+    DOCX::Text t122("now, look at this");
+    t122.size = 20;
+    p12.add_text(t122);
+    p12.add_space();
+    DOCX::Text t123("space and this");
+    t123.size = 20;
+    p12.add_text(t123);
+    p12.add_space(1, 20);
+    DOCX::Text t124("space");
+    t124.size = 20;
+    p12.add_text(t124);
+    docx.add_paragraph(p12);
     
     docx.save("my_document.docx");
     return 0;
