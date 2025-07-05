@@ -32,6 +32,14 @@ int main() {
 
     docx.add_empty_line();
 
+    DOCX::Paragraph title;
+    DOCX::Text t("Welcome to My Document");
+    t.size = 24;
+    title.add_text(t);
+    title.align = DOCX::Paragraph::alignment::CENTER;
+    docx.add_paragraph(title);
+
+    docx.add_empty_line();
     docx.add_paragraph(p);
 
     DOCX::Paragraph p3;
@@ -135,6 +143,20 @@ int main() {
     t124.size = 20;
     p12.add_text(t124);
     docx.add_paragraph(p12);
+
+    docx.add_empty_line();
+
+    DOCX::Paragraph p13;
+    p13.add_text("This text is right aligned");
+    p13.align = DOCX::Paragraph::alignment::RIGHT;
+    docx.add_paragraph(p13);
+
+    docx.add_empty_line();
+
+    DOCX::Paragraph p14;
+    p14.add_text("And this text is justified but in order for the justification to be observable it needs to span multiple lines so I'll put some lorem ipsum here lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.");
+    p14.align = DOCX::Paragraph::alignment::JUSTIFIED;
+    docx.add_paragraph(p14);
     
     docx.save("my_document.docx");
     return 0;
