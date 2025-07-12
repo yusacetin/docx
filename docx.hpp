@@ -72,6 +72,7 @@ public:
         FULL_WIDTH
     };
     alignment align = AUTO;
+    std::string typeface = "";
 
     void add_text(Text t);
     void add_text(std::string text_str);
@@ -96,7 +97,12 @@ class DOCX::Text {
 public:
     Text() = default;
     Text(std::string set_text);
+
     std::string text;
+    std::string typeface = "";
+    std::string color = "";
+    std::string highlight = ""; // highlight color
+    std::string bg_color = "";
     bool bold = false;
     bool italic = false;
     bool underline = false;
@@ -111,6 +117,10 @@ public:
 
 class DOCXUtils {
 public:
+    static std::string latin_typeface;
+    static std::string ea_typeface;
+    static std::string cs_typeface;
+
     static void mkdir(std::string dirpath);
     static void write_file(std::string fpath, std::string content);
     static void delete_file_or_folder(std::string dirpath);
@@ -334,6 +344,14 @@ inline XML::Node DOCX::Paragraph::get() {
 					szCs.attributes["w:val"] = std::to_string(default_font_size * 2); // because half points
 					rPr.add_child(szCs);
                 }
+
+                if (typeface != "") {
+                    XML::Node rFonts("w:rFonts");
+                    rFonts.attributes["w:ascii"] = typeface;
+                    rFonts.attributes["w:eastAsia"] = typeface;
+                    rFonts.self_closing = true;
+                    rPr.add_child(rFonts);
+                }
             }
 
             pPr.add_child(pStyle);
@@ -387,6 +405,38 @@ inline XML::Node DOCX::Paragraph::get() {
                         XML::Node strike("w:strike");
                         strike.self_closing = true;
                         rPr.add_child(strike);
+                    }
+
+                    if (cur_text.typeface != "") {
+                        XML::Node rFonts("w:rFonts");
+                        rFonts.attributes["w:ascii"] = cur_text.typeface;
+                        rFonts.attributes["w:eastAsia"] = cur_text.typeface;
+                        rFonts.attributes["w:hAnsi"] = cur_text.typeface;
+                        rFonts.attributes["w:cs"] = cur_text.typeface;
+                        rFonts.self_closing = true;
+                        rPr.add_child(rFonts);
+                    }
+
+                    if (cur_text.color != "") {
+                        XML::Node color("w:color");
+                        color.self_closing = true;
+                        color.attributes["w:val"] = cur_text.color;
+                        rPr.add_child(color);
+                    }
+
+                    if (cur_text.highlight != "") {
+                        XML::Node highlight("w:highlight");
+                        highlight.self_closing = true;
+                        highlight.attributes["w:val"] = cur_text.highlight;
+                        rPr.add_child(highlight);
+                    }
+
+                    if (cur_text.bg_color != "") {
+                        XML::Node shd("w:shd");
+                        shd.self_closing = true;
+                        shd.attributes["w:val"] = "clear";
+                        shd.attributes["w:fill"] = cur_text.bg_color;
+                        rPr.add_child(shd);
                     }
                 }
                 r.add_child(rPr);
@@ -484,6 +534,10 @@ inline DOCX::Text::Text(std::string set_text) {
 ////////////////////////////
 // DOCX Utils definitions //
 ////////////////////////////
+
+inline std::string DOCXUtils::latin_typeface = "Georgia";
+inline std::string DOCXUtils::ea_typeface = "Noto Serif JP";
+inline std::string DOCXUtils::cs_typeface = "Noto Serif JP";
 
 inline void DOCXUtils::mkdir(std::string dirpath) {
     std::filesystem::create_directory(dirpath);
@@ -702,7 +756,7 @@ inline std::string DOCXUtils::font_table_file() {
     fonts.attributes["xmlns:r"] = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
     {
         XML::Node font("w:font");
-        font.attributes["w:name"] = "Georgia";
+        font.attributes["w:name"] = latin_typeface;
         {
             XML::Node charset("w:charset");
             charset.attributes["w:val"] = "00";
@@ -756,10 +810,10 @@ inline std::string DOCXUtils::styles_file() {
                 XML::Node rpr("w:rPr");
                 {
                     XML::Node rfonts("w:rFonts");
-                    rfonts.attributes["w:ascii"] = "Georgia";
-                    rfonts.attributes["w:hAnsi"] = "Georgia";
-                    rfonts.attributes["w:eastAsia"] = "Georgia";
-                    rfonts.attributes["w:cs"] = "Georgia";
+                    rfonts.attributes["w:ascii"] = latin_typeface;
+                    rfonts.attributes["w:hAnsi"] = latin_typeface;
+                    rfonts.attributes["w:eastAsia"] = ea_typeface;
+                    rfonts.attributes["w:cs"] = cs_typeface;
                     rfonts.self_closing = true;
                     rpr.add_child(rfonts);
 
@@ -823,10 +877,10 @@ inline std::string DOCXUtils::styles_file() {
             XML::Node rpr("w:rPr");
             {
                 XML::Node rfonts("w:rFonts");
-                rfonts.attributes["w:ascii"] = "Georgia";
-                rfonts.attributes["w:hAnsi"] = "Georgia";
-                rfonts.attributes["w:eastAsia"] = "Georgia";
-                rfonts.attributes["w:cs"] = "Georgia";
+                rfonts.attributes["w:ascii"] = latin_typeface;
+                rfonts.attributes["w:hAnsi"] = latin_typeface;
+                rfonts.attributes["w:eastAsia"] = ea_typeface;
+                rfonts.attributes["w:cs"] = cs_typeface;
                 rfonts.self_closing = true;
                 rpr.add_child(rfonts);
             }
@@ -990,22 +1044,22 @@ inline std::string DOCXUtils::theme1_file() {
             theme_elems.add_child(clr_scheme);
 
             XML::Node font_scheme("a:fontScheme");
-            font_scheme.attributes["name"] = "GeorgiaFont";
+            font_scheme.attributes["name"] = "DefaultFont";
             {
                 XML::Node major("a:majorFont");
                 {
                     XML::Node latin("a:latin");
-                    latin.attributes["typeface"] = "Georgia";
+                    latin.attributes["typeface"] = latin_typeface;
                     latin.self_closing = true;
                     major.add_child(latin);
 
                     XML::Node ea("a:ea");
-                    ea.attributes["typeface"] = "Georgia";
+                    ea.attributes["typeface"] = ea_typeface;
                     ea.self_closing = true;
                     major.add_child(ea);
 
                     XML::Node cs("a:cs");
-                    cs.attributes["typeface"] = "Georgia";
+                    cs.attributes["typeface"] = cs_typeface;
                     cs.self_closing = true;
                     major.add_child(cs);
                 }
@@ -1014,17 +1068,17 @@ inline std::string DOCXUtils::theme1_file() {
                 XML::Node minor("a:minorFont");
                 {
                     XML::Node latin("a:latin");
-                    latin.attributes["typeface"] = "Georgia";
+                    latin.attributes["typeface"] = latin_typeface;
                     latin.self_closing = true;
                     minor.add_child(latin);
 
                     XML::Node ea("a:ea");
-                    ea.attributes["typeface"] = "Georgia";
+                    ea.attributes["typeface"] = ea_typeface;
                     ea.self_closing = true;
                     minor.add_child(ea);
 
                     XML::Node cs("a:cs");
-                    cs.attributes["typeface"] = "Georgia";
+                    cs.attributes["typeface"] = cs_typeface;
                     cs.self_closing = true;
                     minor.add_child(cs);
                 }

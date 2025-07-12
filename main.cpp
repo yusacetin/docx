@@ -157,6 +157,52 @@ int main() {
     p14.add_text("And this text is justified but in order for the justification to be observable it needs to span multiple lines so I'll put some lorem ipsum here lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.");
     p14.align = DOCX::Paragraph::alignment::JUSTIFIED;
     docx.add_paragraph(p14);
+
+    docx.add_empty_line();
+
+    DOCX::Paragraph p15;
+    p15.add_text("日本語のテキストです");
+    docx.add_paragraph(p15);
+
+    docx.add_empty_line();
+
+    DOCX::Paragraph p16;
+    p16.add_text("Random text again");
+    docx.add_paragraph(p16);
+
+    docx.add_empty_line();
+
+    DOCX::Paragraph p17;
+    DOCX::Text t17("Casual text but in another typeface");
+    t17.typeface = "Arial";
+    p17.add_text(t17);
+    docx.add_paragraph(p17);
+
+    DOCX::Paragraph p18;
+    DOCX::Text t18("This text is in the default font again");
+    p18.add_text(t18);
+    docx.add_paragraph(p18);
+
+    docx.add_empty_line();
+
+    DOCX::Paragraph p19;
+    {
+        DOCX::Text t1("red foreground");
+        t1.color = "FF0000";
+        p19.add_text(t1);
+
+        DOCX::Text t2(", highlighted section,");
+        t2.highlight = "yellow";
+        p19.add_text(t2);
+
+        p19.add_space();
+
+        DOCX::Text t3("blue background");
+        t3.bg_color = "0000FF";
+        p19.add_text(t3);
+
+    }
+    docx.add_paragraph(p19);
     
     docx.save("my_document.docx");
     return 0;
